@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 users_bp = Blueprint('users', __name__)
 
 
+# Route for get all users
 @users_bp.route('/users', methods=['GET'])
 def get_user():
     users = User.query.all()
@@ -14,6 +15,7 @@ def get_user():
     return jsonify(users)
 
 
+# Route for creating new user
 @users_bp.route('/register_user', methods=['POST'])
 def post_user():
     try:
