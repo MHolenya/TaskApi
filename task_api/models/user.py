@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from task_api.models.database import Base
 
 
+# Create User model
 class User(Base):
     __tablename__ = 'user'
 
