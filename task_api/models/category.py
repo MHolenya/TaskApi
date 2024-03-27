@@ -7,7 +7,7 @@ class Category(Base):
     __tablename__ = 'category'
 
     category_id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, nullable=False)  # category id
+    name = Column(String, unique=True, nullable=False)
 
     def __repr__(self):
         chain = f'<Categoty{self.category_id}>, name={self.name}'

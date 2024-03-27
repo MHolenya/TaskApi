@@ -10,7 +10,6 @@ category_bp = Blueprint('category', __name__)
 # Route to display all categories
 @category_bp.route('/categories', methods=['GET'])
 def get_all_categories():
-
     try:
         # Retrieve all categories from the database
         categories = Category.query.all()
@@ -20,7 +19,7 @@ def get_all_categories():
                                  for category in categories]
 
         # Return JSON response with list of categories
-        return jsonify({'categories': categories_list}), 200
+        return jsonify({'categories': categories_list})
     except SQLAlchemyError as e:
         # Handle database errors
         return jsonify({'error': f'Error retrieving categories: {e}'}), 500
@@ -29,7 +28,6 @@ def get_all_categories():
 # Route to get category by name
 @category_bp.route('/category/name/<name>', methods=['GET'])
 def get_category_by_name(name):
-
     try:
         category = Category.query.filter_by(name=name).first()
         category_id = category.category_id
@@ -46,7 +44,6 @@ def get_category_by_name(name):
 # Route to get category by id
 @category_bp.route('/category/<int:category_id>', methods=['GET'])
 def get_category_by_id(category_id):
-
     try:
         category = Category.query.filter_by(category_id=category_id).first()
         category_id = category.category_id
@@ -63,11 +60,10 @@ def get_category_by_id(category_id):
 # Route to add a new category
 @category_bp.route('/category', methods=['POST'])
 def add_new_category():
-
     try:
         request_body = request.json()
         name = request_body.get('name')
-
+        # Check the name is valid
         if not name or name is not str:
             return jsonify({"message": "Missing valid 'name' field"}), 400
 

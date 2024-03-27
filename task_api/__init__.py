@@ -10,4 +10,5 @@ def create_app():
     app.register_blueprint(tasks_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(category_bp)
+    app.debug = True
     return app
