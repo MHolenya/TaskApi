@@ -10,12 +10,15 @@ users_bp = Blueprint('users', __name__)
 # Route for get all users
 @users_bp.route('/user<int:user_id>', methods=['GET'])
 def get_user(user_id):
+
     try:
         user = User.query.filter_by(id=user_id).first()
+
         if user:
             return jsonify(user)
         else:
             return jsonify({'message': 'User not found'}), 404
+
     except SQLAlchemyError as e:
         return jsonify({'message': f'Errore retrieving user: {e}'}), 500
 
@@ -25,7 +28,7 @@ def get_user(user_id):
 def post_user():
     try:
         request_body = request.json
-
+        # get the values  passed in the JSON body of the POST request
         username = request_body.get('username')
         email = request_body.get('email')
         password = request_body.get('password')
@@ -34,11 +37,12 @@ def post_user():
         check_password = password is not str
         check_username = username is not str
 
+        # check datatype
         if any([check_email, check_password, check_username]):
             return jsonify({'message': 'Missing required field(s)'}), 400
 
         new_user = User(username=username, password=password, email=email)
-
+        # add new user
         db_session.add(new_user)
         db_session.commit()
 
