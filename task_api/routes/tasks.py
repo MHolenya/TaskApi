@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from task_api.models.user import User
 
 # Create a Blueprint called 'tasks' to organize routes related to tasks
 tasks_bp = Blueprint('tasks', __name__)
