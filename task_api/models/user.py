@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String
-from database import Base
+from task_api.models.database import Base
 
 
 class User(Base):
-    _tablename_ = 'user'
+    __tablename__ = 'user'
+
     user_id = Column(Integer, primary_key=True)
     username = Column(String(50), primary_key=True, nullable=False,
                       unique=True)

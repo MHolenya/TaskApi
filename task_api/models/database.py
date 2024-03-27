@@ -1,13 +1,16 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
-DB_USER = os.environ.get['DB_USER']
-DB_PASSW = os.environ.get['DB_PASSW']
-DB_HOST = os.environ.get['HOST']
-DB_NAME = os.environ.get['NAME']
+DB_USER = os.environ['DB_USER']
+DB_PASSW = os.environ['DB_PASSW']
+DB_HOST = os.environ['DB_HOST']
+DB_NAME = os.environ['DB_NAME']
 
-mysql_route = f'msyql:///{DB_USER}:{DB_PASSW}@{DB_HOST}/{DB_NAME}'
+mysql_route = f'mysql+mysqlconnector://{
+    DB_USER}:{DB_PASSW}@{DB_HOST}/{DB_NAME}'
 engine = create_engine(mysql_route)
 db_sesion = scoped_session(sessionmaker(
     autocommit=False, autoflush=False, bind=engine))
