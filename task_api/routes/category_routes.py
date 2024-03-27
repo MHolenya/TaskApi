@@ -26,8 +26,40 @@ def get_all_categories():
         return jsonify({'error': f'Error retrieving categories: {e}'}), 500
 
 
+@category_bp.route('/category/name/<name>', methods=['GET'])
+def get_category_by_name(name):
+    try:
+
+        category = Category.query.filter_by(name=name).first()
+        category_id = category.category_id
+        category_name = category.name
+        category_res = {'id': category_id, 'name': category_name}
+        # Return JSON response with a category
+        return jsonify(category_res), 200
+
+    except SQLAlchemyError as e:
+        # Handle database errors
+        return jsonify({'error': f'Error retrieving category: {e}'}), 500
+
+
+@category_bp.route('/category/<int:category_id>', methods=['GET'])
+def get_category_by_id(category_id):
+    try:
+
+        category = Category.query.filter_by(category_id=category_id).first()
+        category_id = category.category_id
+        category_name = category.name
+        category_res = {'id': category_id, 'name': category_name}
+        # Return JSON response with a category
+        return jsonify(category_res), 200
+
+    except SQLAlchemyError as e:
+        # Handle database errors
+        return jsonify({'error': f'Error retrieving category: {e}'}), 500
+
+
 # Route to add a new category
-@category_bp.route('/categories', methods=['POST'])
+@category_bp.route('/category', methods=['POST'])
 def add_new_category():
     try:
         request_body = request.json()
