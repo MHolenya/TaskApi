@@ -10,10 +10,10 @@ category_bp = Blueprint('category', __name__)
 # Route to display all categories
 @category_bp.route('/categories', methods=['GET'])
 def get_all_categories():
+
     try:
         # Retrieve all categories from the database
         categories = Category.query.all()
-
         # Use a list comprehension to create the list of category data
         categories_list: list = [{'category_id': category.category_id,
                                   'name': category.name}
@@ -26,10 +26,11 @@ def get_all_categories():
         return jsonify({'error': f'Error retrieving categories: {e}'}), 500
 
 
+# Route to get category by name
 @category_bp.route('/category/name/<name>', methods=['GET'])
 def get_category_by_name(name):
-    try:
 
+    try:
         category = Category.query.filter_by(name=name).first()
         category_id = category.category_id
         category_name = category.name
@@ -42,10 +43,11 @@ def get_category_by_name(name):
         return jsonify({'error': f'Error retrieving category: {e}'}), 500
 
 
+# Route to get category by id
 @category_bp.route('/category/<int:category_id>', methods=['GET'])
 def get_category_by_id(category_id):
-    try:
 
+    try:
         category = Category.query.filter_by(category_id=category_id).first()
         category_id = category.category_id
         category_name = category.name
@@ -61,6 +63,7 @@ def get_category_by_id(category_id):
 # Route to add a new category
 @category_bp.route('/category', methods=['POST'])
 def add_new_category():
+
     try:
         request_body = request.json()
         name = request_body.get('name')
