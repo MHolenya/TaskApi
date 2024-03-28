@@ -11,7 +11,7 @@ class Task(Base):
     user_id = Column(Integer, ForeignKey('user.user_id'), nullable=False)
 
     title = Column(String(255), nullable=False)
-    description = Column(Text)
+    description = Column(String(255))
 
     category_id = Column(Integer, ForeignKey(
         'category.category_id'), nullable=False)

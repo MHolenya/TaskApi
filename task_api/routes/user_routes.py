@@ -13,7 +13,6 @@ def get_user(user_id):
 
     try:
         user = User.query.filter_by(id=user_id).first()
-
         if user:
             return jsonify(user)
         else:
@@ -42,6 +41,7 @@ def post_user():
             return jsonify({'message': 'Missing required field(s)'}), 400
 
         new_user = User(username=username, password=password, email=email)
+
         # add new user
         db_session.add(new_user)
         db_session.commit()

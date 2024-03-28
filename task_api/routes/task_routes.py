@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from task_api.models.database import db_session
 from task_api.models.task import Task
 from sqlalchemy.exc import SQLAlchemyError
@@ -33,3 +33,51 @@ def show_task(task_id):
 
     except SQLAlchemyError as e:
         return jsonify({'error': f'Error retrieving task: {e}'}), 500
+
+
+@tasks_bp.route('/task', methods=['POST'])
+def post_task():
+    try:
+        # Get the request body
+        request_body = request.json
+        user_id = request_body.get('user_id')
+        title = request_body.get('title')
+        descripcion = request_body.get('description')
+        descripcion = str(descripcion)
+        status = request_body.get('status')
+        category_id = request_body.get('category_id')
+        due_date = request_body.get('due_date')
+
+        # Check that required fields are present
+        checks = {
+            'user_id': not isinstance(user_id, int),
+            'category_id': not isinstance(category_id, int),
+            'title': not isinstance(title, str),
+            'descripcion': not isinstance(descripcion, str),
+            'status': not isinstance(status, str),
+            'due_date': not isinstance(due_date, str)
+        }
+        print(checks)
+        any_checks_failed = any(checks.values())
+        if any_checks_failed:
+            msg = 'At least one type check failed for the provided data.'
+            return jsonify({'message': msg}), 400
+
+        # Add new task to the database
+        new_task = Task(
+            user_id=user_id,
+            title=title,
+            descripcion=descripcion,
+            status=status,
+            category_id=category_id,
+            due_date=due_date
+        )
+        db_session.add(new_task)
+        db_session.commit()
+
+        # Return successful creation message with category
+        return jsonify({'message': 'Task added succesfully'}), 201
+
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        jsonify({'error': str(e)}), 500

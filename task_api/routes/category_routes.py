@@ -65,14 +65,14 @@ def add_new_category():
         name = request_body.get('name')
         # Check the name is valid
         if not name or name is not str:
-            return jsonify({"message": "Missing valid 'name' field"}), 400
+            return jsonify({'message': 'Missing valid name field'}), 400
 
         # Add new category to the database
         new_category = Category(name=name)
         db_session.add(new_category)
         db_session.commit()
 
-        # Return successful creation message with category id
+        # Return successful creation message with category
         return jsonify({'message': 'Category added succesfully'}), 201
 
     except SQLAlchemyError as e:
