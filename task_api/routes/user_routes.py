@@ -73,3 +73,36 @@ def delete_user(user_id):
         # Rollback in case of any database error
         db_session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+# Route to update a user
+@users_bp.route('/user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+
+    try:
+        user = User.query.get(user_id)
+        # check if user exist
+        if user:
+            data = request.get_json()
+
+            # Update user attributes with values from the JSON data,
+            # if the value is not provided
+            # use the current value from the user object
+            password = data.get('password', user.password)
+            username = data.get('username', user.username)
+            email = data.get('email', user.status)
+
+            # Assign the updated values to the uuser object
+            user.password = password
+            user.username = username
+            user.email = email
+
+            db_session.commit()
+            return jsonify({'message': 'User updated successfully'})
+
+        # if task don't exist
+        else:
+            return jsonify({'message': 'User not found'}), 404
+
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e)}), 500

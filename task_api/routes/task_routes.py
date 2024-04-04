@@ -105,7 +105,7 @@ def delete_task(task_id):
         return jsonify({'error': str(e)}), 500
 
 
-# Route to update  a task
+# Route to update a task
 @tasks_bp.route('/task/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
 
