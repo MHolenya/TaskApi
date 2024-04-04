@@ -59,22 +59,73 @@ def get_category_by_id(category_id):
 
 # Route to add a new category
 @category_bp.route('/category', methods=['POST'])
-def add_new_category():
+def post_category():
     try:
         request_body = request.json()
         name = request_body.get('name')
         # Check the name is valid
         if not name or name is not str:
-            return jsonify({"message": "Missing valid 'name' field"}), 400
+            return jsonify({'message': 'Missing valid name field'}), 400
 
         # Add new category to the database
         new_category = Category(name=name)
         db_session.add(new_category)
         db_session.commit()
 
-        # Return successful creation message with category id
+        # Return successful creation message with category
         return jsonify({'message': 'Category added succesfully'}), 201
 
     except SQLAlchemyError as e:
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# Route to delete a category
+@category_bp.route('/category/<int:category_id>', methods=['DELETE'])
+def delete_task(category_id):
+    try:
+        category = Category.query.get(category_id)
+        # check if category exist
+        if category:
+
+            db_session.delete(category)
+            db_session.commit()
+
+            return jsonify({'message': 'Category deleted successfully'})
+        # if category dont exist
+        else:
+            return jsonify({'message': 'Category not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# Route to update a category
+@category_bp.route('/category/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
+    try:
+        category = Category.query.get(category_id)
+        # check if category exist
+        if category:
+
+            data = request.get_json()
+
+            # Update category attributes with values from the JSON data,
+            # if the value is not provided
+            # use the current value from the category object
+            # Assign the updated values to the category object
+            category.name = data.get('name', category.name)
+
+            db_session.commit()
+
+            return jsonify({'message': 'Category updated successfully'})
+        # if category don't exist
+        else:
+            return jsonify({'message': 'Category not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
         db_session.rollback()
         return jsonify({'error': str(e)}), 500

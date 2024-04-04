@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from task_api.models.database import db_session
 from task_api.models.task import Task
 from sqlalchemy.exc import SQLAlchemyError
@@ -33,3 +33,108 @@ def show_task(task_id):
 
     except SQLAlchemyError as e:
         return jsonify({'error': f'Error retrieving task: {e}'}), 500
+
+
+@tasks_bp.route('/task', methods=['POST'])
+def post_task():
+    try:
+        # Get the request body
+        request_body = request.json
+        user_id = request_body.get('user_id')
+        title = request_body.get('title')
+        description = request_body.get('description')
+        status = request_body.get('status')
+        category_id = request_body.get('category_id')
+        due_date = request_body.get('due_date')
+
+        # Check that required fields are present
+        checks = {
+            'user_id': not isinstance(user_id, int),
+            'category_id': not isinstance(category_id, int),
+            'title': not isinstance(title, str),
+            'description': not isinstance(description, str),
+            'status': not isinstance(status, str),
+            'due_date': not isinstance(due_date, str)
+        }
+        print(description)
+        print(checks)
+        any_checks_failed = any(checks.values())
+        if any_checks_failed:
+            msg = 'At least one type check failed for the provided data.'
+            return jsonify({'message': msg}), 400
+
+        # Add new task to the database
+        new_task = Task(
+            user_id=user_id,
+            title=title,
+            description=description,
+            status=status,
+            category_id=category_id,
+            due_date=due_date
+        )
+
+        db_session.add(new_task)
+        db_session.commit()
+        # Return successful creation message with category
+        return jsonify({'message': 'Task added succesfully'}), 201
+
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# Route to delete a task
+@tasks_bp.route('/task/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    try:
+        task = Task.query.get(task_id)
+        # check if task exist
+        if task:
+
+            db_session.delete(task)
+            db_session.commit()
+
+            return jsonify({'message': 'Task deleted successfully'})
+        # if task don't exist
+        else:
+            return jsonify({'message': 'Task not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# Route to update a task
+@tasks_bp.route('/task/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+
+    try:
+        task = Task.query.get(task_id)
+        # check if task exist
+        if task:
+            data = request.get_json()
+
+            # Update task attributes with values from the JSON data,
+            # if the value is not provided
+            # use the current value from the task object
+            title = data.get('title', task.title)
+            description = data.get('description', task.description)
+            status = data.get('status', task.status)
+            due_date = data.get('due_date', task.due_date)
+
+            # Assign the updated values to the task object
+            task.title = title
+            task.description = description
+            task.status = status
+            task.due_date = due_date
+
+            db_session.commit()
+            return jsonify({'message': 'Task updated successfully'})
+
+        # if task don't exist
+        else:
+            return jsonify({'message': 'Task not found'}), 404
+
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e)}), 500
