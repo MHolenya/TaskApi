@@ -81,3 +81,25 @@ def post_task():
     except SQLAlchemyError as e:
         db_session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+# Route to delete a task
+@tasks_bp.route('/task/<int:task_id>', methods=['DELETE'])
+def delete_category(task_id):
+    try:
+        task = Task.query.get(task_id)
+
+        if task:
+
+            db_session.delete(task)
+            db_session.commit()
+
+            return jsonify({'message': 'Task deleted successfully'})
+
+        else:
+            return jsonify({'message': 'Task not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500

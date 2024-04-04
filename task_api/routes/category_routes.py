@@ -80,9 +80,9 @@ def post_category():
         return jsonify({'error': str(e)}), 500
 
 
-# Route to delete a new category
+# Route to delete a category
 @category_bp.route('/category/<int:category_id>', methods=['DELETE'])
-def delete_category(category_id):
+def delete_task(category_id):
     try:
         category = Category.query.get(category_id)
 
