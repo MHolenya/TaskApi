@@ -42,8 +42,7 @@ def post_task():
         request_body = request.json
         user_id = request_body.get('user_id')
         title = request_body.get('title')
-        descripcion = request_body.get('description')
-        descripcion = str(descripcion)
+        description = request_body.get('description')
         status = request_body.get('status')
         category_id = request_body.get('category_id')
         due_date = request_body.get('due_date')
@@ -53,10 +52,11 @@ def post_task():
             'user_id': not isinstance(user_id, int),
             'category_id': not isinstance(category_id, int),
             'title': not isinstance(title, str),
-            'descripcion': not isinstance(descripcion, str),
+            'description': not isinstance(description, str),
             'status': not isinstance(status, str),
             'due_date': not isinstance(due_date, str)
         }
+        print(description)
         print(checks)
         any_checks_failed = any(checks.values())
         if any_checks_failed:
@@ -67,17 +67,17 @@ def post_task():
         new_task = Task(
             user_id=user_id,
             title=title,
-            descripcion=descripcion,
+            description=description,
             status=status,
             category_id=category_id,
             due_date=due_date
         )
+
         db_session.add(new_task)
         db_session.commit()
-
         # Return successful creation message with category
         return jsonify({'message': 'Task added succesfully'}), 201
 
     except SQLAlchemyError as e:
         db_session.rollback()
-        jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 500

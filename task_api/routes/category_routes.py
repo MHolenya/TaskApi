@@ -59,7 +59,7 @@ def get_category_by_id(category_id):
 
 # Route to add a new category
 @category_bp.route('/category', methods=['POST'])
-def add_new_category():
+def post_category():
     try:
         request_body = request.json()
         name = request_body.get('name')
@@ -76,5 +76,27 @@ def add_new_category():
         return jsonify({'message': 'Category added succesfully'}), 201
 
     except SQLAlchemyError as e:
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# Route to delete a new category
+@category_bp.route('/category/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id):
+    try:
+        category = Category.query.get(category_id)
+
+        if category:
+
+            db_session.delete(category)
+            db_session.commit()
+
+            return jsonify({'message': 'Category deleted successfully'})
+
+        else:
+            return jsonify({'message': 'Category not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
         db_session.rollback()
         return jsonify({'error': str(e)}), 500
