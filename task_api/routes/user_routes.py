@@ -58,7 +58,7 @@ def post_user():
 def delete_user(user_id):
     try:
         user = User.query.get(user_id)
-
+        # check if user exist
         if user:
 
             db_session.delete(user)

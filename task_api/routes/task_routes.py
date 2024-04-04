@@ -88,7 +88,7 @@ def post_task():
 def delete_category(task_id):
     try:
         task = Task.query.get(task_id)
-
+        # check if task exist
         if task:
 
             db_session.delete(task)

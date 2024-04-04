@@ -85,13 +85,38 @@ def post_category():
 def delete_task(category_id):
     try:
         category = Category.query.get(category_id)
-
+        # check if category exist
         if category:
 
             db_session.delete(category)
             db_session.commit()
 
             return jsonify({'message': 'Category deleted successfully'})
+
+        else:
+            return jsonify({'message': 'Category not found'}), 404
+
+    except SQLAlchemyError as e:
+        # Rollback in case of any database error
+        db_session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# Route to update a category
+
+
+@category_bp.route('/category/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
+    try:
+        category = Category.query.get(category_id)
+        # check if category exist
+        if category:
+
+            data = request.get_json()
+
+            category.name = data.get('name', category.name)
+            db_session.commit()
+
+            return jsonify({'message': 'Category updated successfully'}), 200
 
         else:
             return jsonify({'message': 'Category not found'}), 404
