@@ -92,7 +92,7 @@ def delete_task(category_id):
             db_session.commit()
 
             return jsonify({'message': 'Category deleted successfully'})
-
+        # if category dont exist
         else:
             return jsonify({'message': 'Category not found'}), 404
 
@@ -101,9 +101,8 @@ def delete_task(category_id):
         db_session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 # Route to update a category
-
-
 @category_bp.route('/category/<int:category_id>', methods=['PUT'])
 def update_category(category_id):
     try:
@@ -113,11 +112,16 @@ def update_category(category_id):
 
             data = request.get_json()
 
+            # Update category attributes with values from the JSON data,
+            # if the value is not provided
+            # use the current value from the category object
+            # Assign the updated values to the category object
             category.name = data.get('name', category.name)
+
             db_session.commit()
 
-            return jsonify({'message': 'Category updated successfully'}), 200
-
+            return jsonify({'message': 'Category updated successfully'})
+        # if category don't exist
         else:
             return jsonify({'message': 'Category not found'}), 404
 

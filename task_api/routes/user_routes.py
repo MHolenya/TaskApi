@@ -65,7 +65,7 @@ def delete_user(user_id):
             db_session.commit()
 
             return jsonify({'message': 'User deleted successfully'})
-
+        # if user don't exist
         else:
             return jsonify({'message': 'User not found'}), 404
 
