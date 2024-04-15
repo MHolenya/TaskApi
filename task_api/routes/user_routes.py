@@ -7,23 +7,28 @@ from sqlalchemy.exc import SQLAlchemyError
 users_bp = Blueprint('users', __name__)
 
 
-# Route for get all users
-@users_bp.route('/user<int:user_id>', methods=['GET'])
-def get_user(user_id):
+@users_bp.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        data = request.json
 
-    try:
-        user = User.query.filter_by(id=user_id).first()
+        # TODO Enription logic
+        username = data.get('username')
+        password = data.get('password')
+        # Assuming you have a User model
+        user = User.query.filter_by(
+            username=username, password=password)
+
         if user:
-            return jsonify(user)
+            return jsonify({'message': 'Login successful'})
         else:
-            return jsonify({'message': 'User not found'}), 404
-
-    except SQLAlchemyError as e:
-        return jsonify({'message': f'Errore retrieving user: {e}'}), 500
+            return jsonify({'message': 'Invalid username or password'}), 401
+    else:
+        return jsonify({'message': 'Method not allowed'}), 405
 
 
 # Route for creating new user
-@users_bp.route('/register_user', methods=['POST'])
+@users_bp.route('/signup', methods=['POST'])
 def post_user():
     try:
         request_body = request.json
@@ -31,15 +36,15 @@ def post_user():
         username = request_body.get('username')
         email = request_body.get('email')
         password = request_body.get('password')
-
+        print(type(password))
         check_email = email is not str
         check_password = password is not str
         check_username = username is not str
-
+        print(check_email, check_password, check_username)
         # check datatype
-        if any([check_email, check_password, check_username]):
+        if not check_email or not check_password or not check_username:
             return jsonify({'message': 'Missing required field(s)'}), 400
-
+        # TODO ecription logic
         new_user = User(username=username, password=password, email=email)
 
         # add new user
@@ -93,6 +98,7 @@ def update_user(user_id):
             email = data.get('email', user.status)
 
             # Assign the updated values to the uuser object
+            # TODO ecription logic
             user.password = password
             user.username = username
             user.email = email
