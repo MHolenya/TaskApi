@@ -8,17 +8,24 @@ from task_api.models.extensions import bcrypt
 users_bp = Blueprint('users', __name__)
 
 
+# Route for Login with username and password
 @users_bp.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
         data = request.json
 
-        username = data.get('username')
+        if 'username' in data:
+            username = data.get('username')
+            user = User.query.filter_by(
+                username=username).first()
+
+        elif 'email' in data:
+            email = data.get('email')
+            user = User.query.filter_by(
+                email=email).first()
+
         password = data.get('password')
 
-        user = User.query.filter_by(
-            username=username).first()
-        print(user)
         if user and bcrypt.check_password_hash(user.password, password):
             return jsonify({'message': 'Login successful'})
         else:
