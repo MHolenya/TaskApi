@@ -44,7 +44,8 @@ def post_user():
         # check datatype
         if not check_email or not check_password or not check_username:
             return jsonify({'message': 'Missing required field(s)'}), 400
-        # TODO ecription logic
+        # chek if user exist
+        # TODO ecription logic and serch if user exist
         new_user = User(username=username, password=password, email=email)
 
         # add new user
