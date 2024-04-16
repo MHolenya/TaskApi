@@ -13,14 +13,13 @@ def login():
     if request.method == 'POST':
         data = request.json
 
-        # TODO Enription logic
         username = data.get('username')
         password = data.get('password')
-        # Assuming you have a User model
-        user = User.query.filter_by(
-            username=username, password=password).first()
 
-        if user:
+        user = User.query.filter_by(
+            username=username).first()
+        print(user)
+        if user and bcrypt.check_password_hash(user.password, password):
             return jsonify({'message': 'Login successful'})
         else:
             return jsonify({'message': 'Invalid username or password'}), 401
@@ -40,7 +39,6 @@ def post_user():
 
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf-8')
-        print(type(hashed_password))
 
         check_email = email is not str
         check_password = password is not str
