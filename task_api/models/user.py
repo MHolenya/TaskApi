@@ -14,3 +14,21 @@ class User(Base):
         chain = f'<User{self.user_id}>, username={
             self.username}, email={self.email}'
         return chain
+
+    # function to chek if username already exists
+    def chek_username(username: str):
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            return True
+        else:
+            return False
+
+    # function to chek if email already exists
+    def chek_email(email: str):
+        existing_email = User.query.filter_by(email=email).first()
+
+        if existing_email:
+            return True
+        else:
+            return False
