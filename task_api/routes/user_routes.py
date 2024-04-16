@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from task_api.models.user import User
 from task_api.models.database import db_session
 from sqlalchemy.exc import SQLAlchemyError
+from task_api.models.extensions import bcrypt
 
 # Create a Blueprint called 'tasks' to organize routes related to tasks
 users_bp = Blueprint('users', __name__)
@@ -17,7 +18,7 @@ def login():
         password = data.get('password')
         # Assuming you have a User model
         user = User.query.filter_by(
-            username=username, password=password)
+            username=username, password=password).first()
 
         if user:
             return jsonify({'message': 'Login successful'})
@@ -36,17 +37,32 @@ def post_user():
         username = request_body.get('username')
         email = request_body.get('email')
         password = request_body.get('password')
-        print(type(password))
+
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
+        print(type(hashed_password))
+
         check_email = email is not str
         check_password = password is not str
         check_username = username is not str
-        print(check_email, check_password, check_username)
+
         # check datatype
         if not check_email or not check_password or not check_username:
             return jsonify({'message': 'Missing required field(s)'}), 400
-        # chek if user exist
-        # TODO ecription logic and serch if user exist
-        new_user = User(username=username, password=password, email=email)
+
+        # chek if user and email exist
+        exist_email = User.chek_email(email)
+        exist_username = User.chek_username(hashed_password)
+
+        if exist_username:
+            return jsonify({'message': 'username already exist'}), 400
+        if exist_email:
+            return jsonify({'message': 'email already exist'}), 400
+
+            # TODO ecription logic
+
+        new_user = User(username=username,
+                        password=hashed_password, email=email)
 
         # add new user
         db_session.add(new_user)
@@ -86,7 +102,7 @@ def delete_user(user_id):
 def update_user(user_id):
 
     try:
-        user = User.query.get(user_id)
+        user = User.query.get(user_id).first()
         # check if user exist
         if user:
             data = request.get_json()
